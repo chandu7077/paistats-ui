@@ -1,25 +1,37 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../themes/theme.dart';
 import '../widget/button_container.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
 class LoginPage extends StatelessWidget {
   TextEditingController apikeycontroller = TextEditingController();
   TextEditingController secretkeycontroller = TextEditingController();
   RemoteConfig remoteConfig = RemoteConfig.instance;
+  final String exchange;
+  final String root_url;
+
+  LoginPage({required this.root_url, required this.exchange});
 
   void saveDetails(String apiKey, String secret) async {
-    await remoteConfig.ensureInitialized();
-    String root_url = await remoteConfig.getString("rooturl");
-    print(root_url);
-    final response = await http.post(Uri.parse('http://${root_url}/auth/store'),
-        headers: {"exchange": "wazirx", "secret": secret});
+    final response = await http
+        .post(Uri.parse('http://${this.root_url}/auth/store'), headers: {
+      "exchange": this.exchange,
+      "secret": secret,
+      "api_key": apiKey
+    });
     int statusCode = response.statusCode;
-    String responseBody = response.body;
+    dynamic responseBody = json.decode(response.body);
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool(this.exchange, true);
+    preferences.setString(
+        responseBody["exchange"] + "_token", responseBody["token"]);
+    preferences.setString(
+        responseBody["exchange"] + "_identifier", responseBody["identifier"]);
+    print(preferences.getString(responseBody["exchange"] + "_identifier"));
   }
 
   @override

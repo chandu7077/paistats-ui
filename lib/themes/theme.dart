@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Color primaryBlue = Color(0xff2972ff);
-Color sigColor = Colors.indigoAccent;
+Color sigColor = Colors.indigo;
 Color textBlack = Color(0xff222222);
 Color textGrey = Color(0xff94959b);
 Color textWhiteGrey = Color(0xfff1f1f5);
