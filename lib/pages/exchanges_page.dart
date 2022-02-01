@@ -109,7 +109,7 @@ class _ExchangePageState extends State<ExchangePage> {
     }
 
     return Scaffold(
-        backgroundColor: const Color(0xFFFEFEFA),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: sigColor,
           centerTitle: true,

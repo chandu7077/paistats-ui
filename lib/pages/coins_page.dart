@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:paistats/models/Coin.dart';
 import 'package:paistats/models/Exchange.dart';
+import 'package:paistats/widget/bottom_coin_container.dart';
+import 'package:paistats/widget/coin_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../themes/theme.dart';
 import 'package:http/http.dart' as http;
@@ -22,7 +25,10 @@ class _CoinsPageState extends State<CoinsPage> {
   String root_url;
   final key = GlobalKey<ScaffoldState>();
   final TextEditingController _searchQuery = TextEditingController();
+  String selected = "1";
+  int bolded = 1;
   bool _IsSearching = true;
+  double spacing = 55;
   List<Coin> _list = [];
   List<Coin> _searchList = [];
 
@@ -54,12 +60,21 @@ class _CoinsPageState extends State<CoinsPage> {
     );
   }
 
+  ListView _coinListView(coins) {
+    return ListView.builder(
+        itemCount: coins.length,
+        itemBuilder: (context, index) {
+          return CoinUI(coin: coins[index], pressAction: () {});
+        });
+  }
+
   GridView _coinGridListView(coins) {
     String _searchText = _searchQuery.text;
     if (_searchText.isNotEmpty) {
       List<Coin> searchedCoins = [];
       for (var i = 0; i < coins.length; i++) {
-        if (coins[i].symbol.toLowerCase().contains(_searchText.toLowerCase())) {
+        if (coins[i].symbol.toLowerCase().contains(_searchText.toLowerCase()) ||
+            coins[i].name.toLowerCase().contains(_searchText.toLowerCase())) {
           searchedCoins.add(coins[i]);
         }
       }
@@ -67,7 +82,7 @@ class _CoinsPageState extends State<CoinsPage> {
       return GridView.builder(
           itemCount: searchedCoins.length,
           itemBuilder: (context, index) {
-            return Uiitem(searchedCoins[index]);
+            return CoinUI(coin: searchedCoins[index], pressAction: () {});
           },
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 200,
@@ -78,7 +93,7 @@ class _CoinsPageState extends State<CoinsPage> {
       return GridView.builder(
           itemCount: coins.length,
           itemBuilder: (context, index) {
-            return Uiitem(coins[index]);
+            return CoinUI(coin: coins[index], pressAction: () {});
           },
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 200,
@@ -101,11 +116,11 @@ class _CoinsPageState extends State<CoinsPage> {
           backgroundColor: sigColor,
           centerTitle: true,
           foregroundColor: Colors.white,
-          title: Text("CryptoCurrencies"),
+          title: Text("Coins"),
         ),
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -116,15 +131,127 @@ class _CoinsPageState extends State<CoinsPage> {
                     color: sigColor,
                   ),
                   decoration: InputDecoration(
-                      hintText: "Search here..",
+                      contentPadding: EdgeInsets.all(20),
+                      hintText: "Search your coins here..",
                       hintStyle: TextStyle(color: Colors.black)),
                 ),
                 SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
                 Flexible(
                   child: _coinFuture(),
-                )
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Material(
+                    color: Colors.white,
+                    child: Row(children: [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      new GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            this.selected = "1";
+                            this.bolded = 1;
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.home,
+                              color:
+                                  this.selected == "1" ? sigColor : iconBlack,
+                            ),
+                            Text("HOME",
+                                style: TextStyle(
+                                    fontWeight: bolded == 1
+                                        ? FontWeight.bold
+                                        : FontWeight.normal))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: spacing,
+                      ),
+                      new GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            this.selected = "2";
+                            this.bolded = 2;
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              '\u{20B9}',
+                              style: TextStyle(
+                                color:
+                                    this.selected == "2" ? sigColor : iconBlack,
+                              ),
+                            ),
+                            Text("INR",
+                                style: TextStyle(
+                                    fontWeight: bolded == 2
+                                        ? FontWeight.bold
+                                        : FontWeight.normal))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: spacing,
+                      ),
+                      new GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            this.selected = "3";
+                            this.bolded = 3;
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              "₮",
+                              style: TextStyle(
+                                color:
+                                    this.selected == "3" ? sigColor : iconBlack,
+                              ),
+                            ),
+                            Text("USDT",
+                                style: TextStyle(
+                                    fontWeight: bolded == 3
+                                        ? FontWeight.bold
+                                        : FontWeight.normal))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: spacing,
+                      ),
+                      new GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            this.selected = "4";
+                            this.bolded = 4;
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.home_filled,
+                              color:
+                                  this.selected == "4" ? sigColor : iconBlack,
+                            ),
+                            Text("HOME",
+                                style: TextStyle(
+                                    fontWeight: bolded == 4
+                                        ? FontWeight.bold
+                                        : FontWeight.normal))
+                          ],
+                        ),
+                      ),
+                    ]))
               ],
             ),
           ),
@@ -143,27 +270,44 @@ class Uiitem extends StatelessWidget {
         },
         child: Container(
             alignment: Alignment.center,
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
                   children: [
-                    Text(this.coin.base.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    Text("/" + this.coin.quote.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: Colors.white60))
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(this.coin.base.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        Text("/" + this.coin.quote.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.white60,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(this.coin.name.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.lime,
+                                fontWeight: FontWeight.normal)),
+                      ],
+                    ),
                   ],
-                ),
-                SizedBox(height: 10),
-                Text(this.coin.name.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.limeAccent))
-              ],
-            ),
+                )),
             decoration: BoxDecoration(
-                color: sigColor, borderRadius: BorderRadius.circular(5))));
+                color: Colors.blueGrey,
+                borderRadius: BorderRadius.circular(5))));
   }
 }
